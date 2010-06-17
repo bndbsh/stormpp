@@ -36,7 +36,7 @@ add_executable(test ${TEST_SOURCES})
 target_link_libraries(test stormpp gtest)
 
 add_dependencies(test stormpp)
-add_custom_command(TARGET test POST_BUILD COMMAND test)
+add_custom_command(TARGET test POST_BUILD COMMAND test WORKING_DIRECTORY ${storm_SOURCE_DIR}/test)
 
 
 if (MSVC_IDE)

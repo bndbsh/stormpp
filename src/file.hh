@@ -38,10 +38,10 @@ public:
 	};
 	
 	/**
-	 * Construct a File object attached to fileName on disk
-	 * @arg fileName full path to the file on disk.
+	 * Construct a File object attached to filename on disk
+	 * @arg filename full path to the file on disk.
 	 */
-	File(const std::string& fileName);
+	File(const std::string& filename);
 	
 	/**
 	 * Constructs a default, inoperative File object

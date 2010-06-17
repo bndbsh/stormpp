@@ -6,7 +6,7 @@ File::File() : mode(Invalid) {
 	
 }
 
-File::File(const std::string& fileName) : mode(Disk) {
+File::File(const std::string& filename) : mode(Disk) {
 	
 }
 
