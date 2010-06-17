@@ -27,4 +27,14 @@ void Archive::flush() {
 	SFileFlushArchive(mpqHandle);
 }
 
+bool Archive::hasFile(const std::string& filename) const {
+	std::string name = filename;
+	int index = name.find('/');
+	while (index != -1) {
+		name.replace(index, 1, "\\");
+		index = name.find('/');
+	}
+	return SFileHasFile(mpqHandle, name.c_str());
+}
+
 }

@@ -40,6 +40,13 @@ public:
 	
 	///Cleanup
 	~Archive();
+	
+	/**
+	 * Checks for the existence of a file in the hashtable
+	 * @arg filename to check for
+	 * @returns true if the file exists in the hashtable
+	 */
+	bool hasFile(const std::string& filename) const;
 private:
 	///The file on disk
 	std::fstream file;
