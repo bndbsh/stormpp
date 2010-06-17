@@ -4,22 +4,9 @@
 #include <StormLib.h>
 #include <string>
 #include <fstream>
-#include <exception>
+#include "exceptions.hh"
 
 namespace storm {
-
-/** 
- * @brief as the name implies, thrown when a file is not found
- * @author amro
- */
-class FileNotFound : public std::exception {
-	std::string data;
-public:
-	FileNotFound(const std::string& filename) : data("File not found: " + filename) { };
-	virtual ~FileNotFound() throw() { };
-
-	inline virtual const char* what() const throw() {return data.c_str();};
-};
 
 /** 
  * @brief thrown when an operation is attempted on an invalid File object
