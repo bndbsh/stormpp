@@ -6,8 +6,11 @@
 #include <fstream>
 #include "exceptions.hh"
 
-namespace storm {
+#include "object.hh"
 
+namespace storm {
+class Archive;
+typedef boost::intrusive_ptr<Archive> ArchiveHandle;
 /** 
  * @brief thrown when an operation is attempted on an invalid File object
  * @author amro
@@ -25,16 +28,16 @@ public:
  * @brief Represents a file, either on disk or in an archive
  * @author amro
  */
-class File {
+class File : public Object {
 public:
 	/**
 	 * Operating mode for this file. This affects the behavior
 	 * of read and write operations.
 	 */
 	enum FileMode {
-		Disk,
-		MPQ,
-		Invalid
+		Disk = 0,
+		MPQ = 1,
+		Invalid = 2
 	};
 	
 	/**
@@ -44,33 +47,69 @@ public:
 	File(const std::string& filename);
 	
 	/**
-	 * Constructs a default, inoperative File object
+	 * Constructs a File object attached to an archive
+	 * @arg filename filename in the archive
+	 * @arg archive handle to the archive
 	 */
+	File(const std::string& filename, ArchiveHandle archive);
+	
+	///Constructs a default, inoperative File object
 	File();
 	
-	///Opens the file for reading and writing, if necessary.
-	void open();
+	///Copy constructor
+	File(const File& file);
+	
+	///Cleanup
+	~File();
+	
+	///Closes the file
+	void close();
 	
 	/**
 	 * Attempts to write count bytes from buffer into the file.
+	 * @returns number of bytes actually written
 	 */
-	unsigned int write(char* buffer, unsigned int count) throw (InvalidFile);
+	unsigned int write(char* buffer, unsigned int count) throw (InvalidOperation, MPQError);
 	
 	/**
 	 * Attempts to read count bytes from file into the buffer.
+	 * @returns number of bytes actually reads
 	 */
-	unsigned int read(char* buffer, unsigned int count) throw (InvalidFile);
+	unsigned int read(char* buffer, unsigned int count) throw (InvalidOperation, MPQError);
+	
+	///Opens the file for reading.
+	///@returns reference to self for chain calling
+	File& openRead() throw(InvalidOperation, MPQError, FileNotFound);
+	
+	///@returns true if the file is open
+	bool isOpen() const;
+	
+	/**
+	 * Assignment operator.
+	 * Copies the data from file into this file.
+	 * @arg file file to copy from
+	 */
+	File& operator=(const File& file);
 private:
 	///Operating mode
 	FileMode mode;
 	
 	///File's StormLib handle, if in MPQ mode
-	HANDLE mpqHandle;
+	HANDLE fileHandle;
 	
 	///File on disk, if in Disk mode
-	std::fstream fileHandle;
+	std::fstream diskFile;
+	
+	///The archive this file belongs to, if in MPQ mode
+	ArchiveHandle archive;
+	
+	///The file's filename (full path)
+	std::string filename;
+	
+	///True if the file is open
+	bool open;
 };
-
+typedef boost::intrusive_ptr<File> FileHandle;
 }
 
 #endif

@@ -37,4 +37,28 @@ bool Archive::hasFile(const std::string& filename) const {
 	return SFileHasFile(mpqHandle, name.c_str());
 }
 
+bool Archive::isOpen() const {
+	return open;
+}
+
+File& Archive::operator[](const std::string& filename) {
+	if (!hasFile(filename)) throw FileNotFound(filename);
+	if (files.find(filename) != files.end()) return files[filename];
+	else {
+		files[filename] = File(filename, ArchiveHandle(this));
+	}
+}
+
+const File& Archive::operator[](const std::string& filename) const {
+	if (!hasFile(filename)) throw FileNotFound(filename);
+	if (files.find(filename) != files.end()) return files.at(filename);
+	else {
+		throw InvalidOperation("Not yet implemented.");
+	}
+}
+
+HANDLE Archive::getHandle() const {
+	if (!open) return 0;
+	return mpqHandle;
+}
 }

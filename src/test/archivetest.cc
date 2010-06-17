@@ -22,11 +22,19 @@ TEST_F(ArchiveTest, Constructor) {
 }
 
 TEST_F(ArchiveTest, Reading) {
-	Archive read("simple.mpq");
+	ArchiveHandle readh = ArchiveHandle(new Archive("simple.mpq"));
+	Archive& read = *readh;
 	EXPECT_EQ(true, read.hasFile("file1"));
 	EXPECT_EQ(true, read.hasFile("dir\\file2"));
 	EXPECT_EQ(true, read.hasFile("dir\\file3"));
 	EXPECT_EQ(true, read.hasFile("dir/file3"));
+	EXPECT_THROW(read["nonexistant"], FileNotFound);
+// 	read["file1"];
+	ASSERT_NO_THROW(read["file1"]);
+	char buffer[5];
+	File& f = read["file1"];
+	f.openRead().read(buffer, 5);
+	ASSERT_NO_THROW(read["file1"].openRead().read(buffer, 5));
 }
 
 }

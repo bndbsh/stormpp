@@ -2,13 +2,16 @@
 #define _STORM_ARCHIVE_HH_
 
 #include "exceptions.hh"
+#include "file.hh"
 
 #include <StormLib.h>
 
 #include <fstream>
+#include <map>
+
+#include "object.hh"
 
 namespace storm {
-
 /** 
  * @brief thrown when trying to open an invalid archive
  * @author amro
@@ -26,7 +29,7 @@ public:
  * @brief Represents an MPQ archive
  * @author amro
  */
-class Archive {
+class Archive : public Object {
 public:
 	/**
 	 * Constructs an archive from the given path. If create is true, it will
@@ -47,6 +50,18 @@ public:
 	 * @returns true if the file exists in the hashtable
 	 */
 	bool hasFile(const std::string& filename) const;
+	
+	///Accessor for files. Attempts to read file filename from Archive
+	File& operator[](const std::string& filename);
+	
+	///Const accessor for files. Attempts to read file filename from Archive
+	const File& operator[](const std::string& filename) const;
+
+	///@returns true if the archive is open
+	bool isOpen() const;
+	
+	///@returns the handle if the archive is open, 0 otherwise
+	HANDLE getHandle() const;
 private:
 	///The file on disk
 	std::fstream file;
@@ -57,10 +72,15 @@ private:
 	///True if the archive is currently open via StormLib
 	bool open;
 	
+	typedef std::map<std::string, File> FileMap;
+	
+	///Cache for files
+	FileMap files;
+	
 	///Flushes any unwritten data
 	void flush();
 };
-
+typedef boost::intrusive_ptr<Archive> ArchiveHandle;
 }
 
 #endif
