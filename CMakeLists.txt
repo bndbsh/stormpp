@@ -22,7 +22,7 @@ set (STORM_SOURCES src/archive src/file)
 
 set (STORM_LIBRARIES StormLib)
 
-set (TEST_SOURCES src/test/runner src/test/archivetest)
+set (TEST_SOURCES src/test/runner src/test/archivetest src/test/filetest)
 
 if (UNIX)
 	add_library(stormpp SHARED ${STORM_SOURCES})
