@@ -49,6 +49,9 @@ private:
 	
 	///True if the archive is currently open via StormLib
 	bool open;
+	
+	///Flushes any unwritten data
+	void flush();
 };
 
 }

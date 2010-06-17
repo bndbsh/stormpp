@@ -23,4 +23,8 @@ Archive::~Archive() {
 	if (open) SFileCloseArchive(mpqHandle);
 }
 
+void Archive::flush() {
+	SFileFlushArchive(mpqHandle);
+}
+
 }

@@ -14,10 +14,9 @@ protected:
 	}
 };
 
-TEST_F(ArchiveTest, SanityChecks) {
+TEST_F(ArchiveTest, Constructor) {
 	ASSERT_THROW(Archive("nonexistantpath"), FileNotFound);
 	ASSERT_THROW(Archive("invalid.mpq"), InvalidArchive);
-	Archive("empty.mpq");
 	ASSERT_NO_THROW(Archive("empty.mpq"));
 }
 
