@@ -1,4 +1,4 @@
-PROJECT(storm)
+PROJECT(stormpp)
 
 cmake_minimum_required(VERSION 2.4)
 if (UNIX)
@@ -18,25 +18,26 @@ if(COMMAND cmake_policy)
 	cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-set (STORM_SOURCES src/archive)
+set (STORM_SOURCES src/archive src/file)
 
 set (STORM_LIBRARIES StormLib)
 
 set (TEST_SOURCES src/test/runner src/test/archivetest)
 
-add_executable(test ${TEST_SOURCES})
-target_link_libraries(test storm gtest)
-
-add_dependencies(test engine xflight)
-add_custom_command(TARGET test POST_BUILD COMMAND test WORKING_DIRECTORY ${xflight_SOURCE_DIR}/bin)
-
 if (UNIX)
-	add_library(storm SHARED ${STORM_SOURCES})
+	add_library(stormpp SHARED ${STORM_SOURCES})
 else (UNIX)
-	add_library(storm STATIC ${STORM_SOURCES})
+	add_library(stormpp STATIC ${STORM_SOURCES})
 endif(UNIX)
 
-target_link_libraries(storm ${STORM_LIBRARIES})
+target_link_libraries(stormpp ${STORM_LIBRARIES})
+
+add_executable(test ${TEST_SOURCES})
+target_link_libraries(test stormpp gtest)
+
+add_dependencies(test stormpp)
+add_custom_command(TARGET test POST_BUILD COMMAND test)
+
 
 if (MSVC_IDE)
 	# hack to get around the "Debug" and "Release" directories cmake tries to add on Windows
