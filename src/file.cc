@@ -18,7 +18,7 @@ File::File(const File& file) {
 	open = file.open;
 }
 
-File::File(const std::string& filename, ArchiveHandle archive) : mode(MPQ), filename(filename), open(false) {
+File::File(const std::string& filename, ArchiveHandle archive) : mode(MPQ), archive(archive), filename(filename), open(false) {
 	
 }
 
@@ -40,7 +40,11 @@ unsigned int File::read(char* data, unsigned int count) throw(InvalidOperation, 
 	if (mode == MPQ) {
 		HANDLE mpqHandle = archive->getHandle();
 		if (mpqHandle == 0) throw InvalidOperation("Invalid MPQ handle. Was the archive closed prematurely?");
-		
+		unsigned int actualCount = 0;
+		if (!SFileReadFile(fileHandle, data, count, &actualCount, 0)) {
+			throw MPQError("Error while reading from file " + filename);
+		}
+		return actualCount;
 	}
 	return 0;
 }
@@ -70,6 +74,12 @@ void File::close() {
 File& File::operator=(const File& file) {
 	if (mode == MPQ) {
 		
+	} else if (mode == Invalid) {
+		mode = file.mode;
+		archive = file.archive;
+		filename = file.filename;
+		fileHandle = file.fileHandle;
+		open = file.open;
 	}
 	return *this;
 }

@@ -46,6 +46,7 @@ File& Archive::operator[](const std::string& filename) {
 	if (files.find(filename) != files.end()) return files[filename];
 	else {
 		files[filename] = File(filename, ArchiveHandle(this));
+		return files[filename];
 	}
 }
 
