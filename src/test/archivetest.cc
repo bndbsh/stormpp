@@ -33,13 +33,13 @@ TEST_F(ArchiveTest, Reading) {
 	ASSERT_NO_THROW(read["dir/file3"]);
 	char buffer[3];
 	memset(buffer, 0, 3);
-	File& f = read["file1"];
+	File f = read["file1"];
 	ASSERT_NO_THROW(f.openRead().read(buffer, 2));
 	EXPECT_EQ(std::string("FI"), buffer);
 	ASSERT_NO_THROW(f.read(buffer, 2));
 	EXPECT_EQ(std::string("LE"), buffer);
 	
-	File& f3 = read["dir\\file3"];
+	File f3 = read["dir\\file3"];
 	ASSERT_NO_THROW(f3.openRead().read(buffer, 2));
 	EXPECT_EQ(std::string("FI"), buffer);
 	ASSERT_NO_THROW(f3.read(buffer, 2));

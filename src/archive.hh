@@ -52,11 +52,8 @@ public:
 	bool hasFile(const std::string& filename) const;
 	
 	///Accessor for files. Attempts to read file filename from Archive
-	File& operator[](const std::string& filename);
+	File operator[](const std::string& filename);
 	
-	///Const accessor for files. Attempts to read file filename from Archive
-	const File& operator[](const std::string& filename) const;
-
 	///@returns true if the archive is open
 	bool isOpen() const;
 	

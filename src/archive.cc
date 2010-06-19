@@ -41,21 +41,9 @@ bool Archive::isOpen() const {
 	return open;
 }
 
-File& Archive::operator[](const std::string& filename) {
+File Archive::operator[](const std::string& filename) {
 	if (!hasFile(filename)) throw FileNotFound(filename);
-	if (files.find(filename) != files.end()) return files[filename];
-	else {
-		files[filename] = File(filename, ArchiveHandle(this));
-		return files[filename];
-	}
-}
-
-const File& Archive::operator[](const std::string& filename) const {
-	if (!hasFile(filename)) throw FileNotFound(filename);
-	if (files.find(filename) != files.end()) return files.at(filename);
-	else {
-		throw InvalidOperation("Not yet implemented.");
-	}
+	return File(filename, ArchiveHandle(this));
 }
 
 HANDLE Archive::getHandle() const {
