@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <stdio.h>
 #include "archive.hh"
 
 using namespace storm;
@@ -16,6 +17,7 @@ protected:
 
 TEST_F(ArchiveTest, Constructor) {
 	ASSERT_THROW(Archive("nonexistantpath"), FileNotFound);
+	ASSERT_THROW(Archive("invalid.mpq", 24), InvalidOperation);
 	ASSERT_THROW(Archive("invalid.mpq"), InvalidArchive);
 	ASSERT_NO_THROW(Archive("empty.mpq"));
 	ASSERT_NO_THROW(Archive("simple.mpq"));
@@ -28,7 +30,6 @@ TEST_F(ArchiveTest, Reading) {
 	EXPECT_EQ(true, read.hasFile("dir\\file2"));
 	EXPECT_EQ(true, read.hasFile("dir\\file3"));
 	EXPECT_EQ(true, read.hasFile("dir/file3"));
-	EXPECT_THROW(read["nonexistant"], FileNotFound);
 	ASSERT_NO_THROW(read["file1"]);
 	ASSERT_NO_THROW(read["dir/file3"]);
 	char buffer[3];
@@ -44,6 +45,19 @@ TEST_F(ArchiveTest, Reading) {
 	EXPECT_EQ(std::string("FI"), buffer);
 	ASSERT_NO_THROW(f3.read(buffer, 2));
 	EXPECT_EQ(std::string("LE"), buffer);
+}
+
+TEST_F(ArchiveTest, Writing) {
+	remove("local/write1.mpq");
+	ArchiveHandle readh;
+	ASSERT_NO_THROW(readh = ArchiveHandle(new Archive("local/write1.mpq", 32)));
+	Archive& read = *readh;
+	File f;
+	ASSERT_NO_THROW(f = read["test"]);
+	ASSERT_NO_THROW(f.openWrite(4));
+	ASSERT_NO_THROW(f.write("TEST", 4));
+	ASSERT_NO_THROW(f.close());
+	remove("local/write1.mpq");
 }
 
 }

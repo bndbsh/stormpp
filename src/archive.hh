@@ -32,14 +32,15 @@ public:
 class Archive : public Object {
 public:
 	/**
-	 * Constructs an archive from the given path. If create is true, it will
-	 * create it if it does not already exist. If create is false, it will
-	 * throw FileNotFound.
+	 * Constructs an archive from the given path. If hashtableSize is not 0,
+	 * it will create the archive. Else, it will attempt to open it.
 	 * @arg fileName full path to the archive
-	 * @arg create if true, create archive if it doesn't exist
-	 * @throws FileNotFound
+	 * @arg hashtableSize the size of the hashtable (i.e. max file capacity)
+	 * @throws FileNotFound if hashtableSize is 0 and the file does not exist
+	 * @throws InvalidArchive if hashtableSize is 0 and the file is not recognized
+	 * @throws InvalidOperation if hashtableSize is nonzero and the file exists
 	 */
-	Archive(const std::string& filename, bool create = false) throw(FileNotFound, InvalidArchive);
+	Archive(const std::string& filename, unsigned int hashtableSize = 0) throw(FileNotFound, InvalidOperation, InvalidArchive);
 	
 	///Cleanup
 	~Archive();

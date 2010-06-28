@@ -1,21 +1,20 @@
 #include "archive.hh"
 
+#include <sys/stat.h>
 #include <iostream>
 
 namespace storm {
 
-Archive::Archive(const std::string& filename, bool create) throw(FileNotFound, InvalidArchive) : mpqHandle(0), open(false) {
-	file.exceptions(std::ios::eofbit | std::ios::failbit | std::ios::badbit);
-	try {
-		file.open(filename.c_str());
-	} catch (std::exception e) {
-		throw FileNotFound(filename);
+Archive::Archive(const std::string& filename, unsigned int hashtableSize) throw(FileNotFound, InvalidOperation, InvalidArchive) : mpqHandle(0), open(false) {
+	struct stat fileInfo; 
+	if(stat(filename.c_str(), &fileInfo) == 0) { 
+		if (hashtableSize > 0) throw InvalidOperation("File already exists: " + filename);
+		if (!SFileOpenArchive(filename.c_str(), 0, 0, &mpqHandle)) throw InvalidArchive(filename);
+	} else {
+		if (hashtableSize == 0) throw FileNotFound(filename);
+		if (errno == ENOTDIR) throw InvalidOperation("path does not exist"); ///TODO: improve
+		if (!SFileCreateArchive(filename.c_str(), 0, hashtableSize, &mpqHandle)) throw InternalError();
 	}
-	int nError = ERROR_SUCCESS;
-
-	if(!SFileOpenArchive(filename.c_str(), 0, 0, &mpqHandle)) nError = GetLastError();
-	if (nError != ERROR_SUCCESS) throw InvalidArchive(filename);
-	
 	open = true;
 }
 
@@ -42,7 +41,6 @@ bool Archive::isOpen() const {
 }
 
 File Archive::operator[](const std::string& filename) {
-	if (!hasFile(filename)) throw FileNotFound(filename);
 	return File(filename, ArchiveHandle(this));
 }
 

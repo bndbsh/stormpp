@@ -41,6 +41,16 @@ public:
 	};
 	
 	/**
+	 * IO mode for this file. This affects which operations
+	 * are permitted.
+	 */
+	enum IOMode {
+		Read = 0,
+		Write = 1,
+		Closed = 2
+	};
+	
+	/**
 	 * Construct a File object attached to filename on disk
 	 * @arg filename full path to the file on disk.
 	 */
@@ -69,7 +79,7 @@ public:
 	 * Attempts to write count bytes from buffer into the file.
 	 * @returns number of bytes actually written
 	 */
-	unsigned int write(char* buffer, unsigned int count) throw (InvalidOperation, MPQError);
+	unsigned int write(const char* buffer, unsigned int count) throw (InvalidOperation, MPQError);
 	
 	/**
 	 * Attempts to read count bytes from file into the buffer.
@@ -80,6 +90,11 @@ public:
 	///Opens the file for reading.
 	///@returns reference to self for chain calling
 	File& openRead() throw(InvalidOperation, MPQError, FileNotFound);
+	
+	///Opens the file for writing.
+	///@arg fileSize the size of the file. This is exactly how many bytes must be subsequently written to the file.
+	///@returns reference to self for chain calling
+	File& openWrite(unsigned int fileSize) throw(InvalidOperation, MPQError);
 	
 	///@returns true if the file is open
 	bool isOpen() const;
@@ -93,6 +108,9 @@ public:
 private:
 	///Operating mode
 	FileMode mode;
+	
+	///IO mode
+	IOMode ioMode;
 	
 	///File's StormLib handle, if in MPQ mode
 	HANDLE fileHandle;
