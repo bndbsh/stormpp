@@ -57,7 +57,7 @@ TEST_F(ArchiveTest, Writing) {
 	ASSERT_NO_THROW(f.openWrite(4));
 	ASSERT_NO_THROW(f.write("TEST", 4));
 	ASSERT_NO_THROW(f.close());
-	remove("local/write1.mpq");
+// 	remove("local/write1.mpq");
 }
 
 }

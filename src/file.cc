@@ -44,10 +44,17 @@ File& File::operator=(const File& file) {
 	return *this;
 }
 
+// bool WINAPI SFileWriteFile(
+//   HANDLE hFile,                     // Handle to the file
+//   const void * pvData,              // Pointer to data to be written
+//   DWORD dwSize,                     // Size of the data pointed by pvData
+//   DWORD dwCompression               // Specifies compression of the data block
+// );
+
 unsigned int File::write(const char* data, unsigned int count) throw(InvalidOperation, MPQError) {
 	if (mode == Invalid) throw InvalidOperation("Cannot write to an invalid file.");
 	if (ioMode == Read) throw InvalidOperation("Cannot write to a read-mode file.");
-	throw InvalidOperation("Writing to files is not yet implemented.");
+	if (!SFileWriteFile(fileHandle, data, count, MPQ_COMPRESSION_ZLIB)) throw MPQError("Error while writing to file.");
 	return 0;
 }
 
@@ -69,10 +76,12 @@ unsigned int File::read(char* data, unsigned int count) throw(InvalidOperation, 
 File& File::openRead() throw (InvalidOperation, MPQError, FileNotFound) {
 	if (mode == Invalid) throw InvalidOperation("Cannot open an invalid file.");
 	if (mode == MPQ) {
+		if (ioMode != Closed) throw InvalidOperation("Cannot open a file that is already open.");
 		HANDLE mpqHandle = archive->getHandle();
 		if (mpqHandle == 0) throw InvalidOperation("Invalid MPQ handle. Was the archive closed prematurely?");
 		if (!SFileOpenFileEx(mpqHandle, filename.c_str(), 0, &fileHandle)) throw MPQError("Error opening file for reading: " + filename);
 		open = true;
+		ioMode = Read;
 	} else throw InvalidOperation("Opening Disk files is not yet implemented.");
 	return *this;
 }
@@ -91,11 +100,12 @@ File& File::openWrite(unsigned int fileSize) throw (InvalidOperation, MPQError) 
 	if (mode == Invalid) throw InvalidOperation("Cannot open an invalid file.");
 	if (mode == Disk) throw InvalidOperation("Not yet implemented.");
 	if (mode == MPQ) {
-		if (ioMode == Read) throw InvalidOperation("Cannot open a read file for writing.");
+		if (ioMode != Closed) throw InvalidOperation("Cannot open a file that is already open.");
 		HANDLE mpqHandle = archive->getHandle();
 		if (mpqHandle == 0) throw InvalidOperation("Invalid MPQ handle. Was the archive closed prematurely?");
 		if (!SFileCreateFile(mpqHandle, filename.c_str(), 0, fileSize, 0, 0, &fileHandle)) throw MPQError("Error opening file for writing: " + filename);
 		open = true;
+		ioMode = Write;
 	}
 	return *this;
 }
